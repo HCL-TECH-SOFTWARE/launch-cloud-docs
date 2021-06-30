@@ -11,12 +11,9 @@
 
 ## Prerequisites
 
-1. Kubernetes 1.16.0+; kubectl and oc CLI; Helm 3;
-  * Install and setup oc/kubectl CLI depending on your architecture.
-    * [ppc64le](https://mirror.openshift.com/pub/openshift-v4/ppc64le/clients/ocp/stable/openshift-client-linux.tar.gz)
-    * [s390x](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/stable/openshift-client-linux.tar.gz)
-    * [x86_64](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz)
-  * [Install and setup the Helm 3 CLI](https://helm.sh/docs/intro/install/).
+1. Kubernetes 1.16.0+; kubectl CLI; Helm 3;
+  * [Install and setup kubectl CLI](https://kubernetes.io/docs/tasks/tools/)
+  * [Install and setup the Helm 3 CLI](https://helm.sh/docs/intro/install/)
 
 2. Image and Helm Chart - The HCL Launch server image and helm chart can be accessed via the HCL Container Registry (hclcr.io) and public Helm repository.
   * The public Helm chart repository can be accessed at https://hclcr.io/chartrepo/launch-helm and directions for accessing the HCL Launch server chart will be discussed later in this README.
@@ -24,14 +21,14 @@
     * An imagePullSecret must be created to be able to authenticate and pull images from the HCL Container Registry.  Once this secret has been created you will specify the secret name as the value for the image.secret parameter in the values.yaml you provide to 'helm install ...'  Note: Secrets are namespace scoped, so they must be created in every namespace you plan to install Launch into.  Following is an example command to create an imagePullSecret named 'entitledregistry-secret'.
 
 ```
-oc create secret docker-registry entitledregistry-secret --docker-username=<username> --docker-password=<cli-secret> --docker-server=hclcr.io
+kubectl create secret docker-registry entitledregistry-secret --docker-username=<username> --docker-password=<cli-secret> --docker-server=hclcr.io
 ```
 
 3. Database - HCL Launch requires a database.  The database may be running in your cluster or on hardware that resides outside of your cluster.  This database  must be configured as described in [Installing the server database](https://devops.hcldoc.com/launch/7.1.2/#com.udeploy.install.doc/topics/DBinstall/) before installing the containerized HCL Launch server.  The values used to connect to the database are required when installing the HCL Launch server.  The Apache Derby database type is not supported when running the HCL Launch server in a Kubernetes cluster.
 
 4. Secret - A Kubernetes Secret object must be created to store the initial HCL Launch server administrator password, the password used to access the database mentioned above, and the password for all keystores used by the HCL Launch server.  The name of the secret you create must be specified in the property 'secret.name' in your values.yaml when installing via Helm chart.
 
-* Through the oc/kubectl CLI, create a Secret object in the target namespace.
+* Through the kubectl CLI, create a Secret object in the target namespace.
     Generate the base64 encoded values for the initial Launch admin password, database password, and the password for all keystores used by the product.
 
 ```
@@ -57,10 +54,10 @@ data:
   keystorepassword: TXlLZXlzdG9yZVBhc3N3b3Jk
 ```
 
-  * Create the Secret using oc apply
+  * Create the Secret using kubectl apply
 
 ```
-oc apply -f ./secret.yaml
+kubectl apply -f ./secret.yaml
 ```
 
   * Delete or shred the secret.yaml file.
@@ -100,7 +97,7 @@ spec:
     matchLabels:
       volume: launch-ext-lib-vol
 ```
-* Dynamic Volume Provisioning - If your cluster supports [dynamic volume provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/), you may use it to create the PV and PVC. However, the JDBC drivers will still need to be copied to the PV. To copy the JDBC driver(s) to your PV during the chart installation process, first write a bash script that copies the JDBC driver(s) from a location accessible from your cluster to `${UCD_HOME}/ext_lib/`. Next, store the script, named `script.sh`, in a yaml file describing a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/).  Finally, create the ConfigMap in your cluster by running a command such as `oc create configmap <map-name> <data-source>`.  Below is an example ConfigMap yaml file that copies a MySQL .jar file from a web server using wget.
+* Dynamic Volume Provisioning - If your cluster supports [dynamic volume provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/), you may use it to create the PV and PVC. However, the JDBC drivers will still need to be copied to the PV. To copy the JDBC driver(s) to your PV during the chart installation process, first write a bash script that copies the JDBC driver(s) from a location accessible from your cluster to `${UCD_HOME}/ext_lib/`. Next, store the script, named `script.sh`, in a yaml file describing a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/).  Finally, create the ConfigMap in your cluster by running a command such as `kubectl create configmap <map-name> <data-source>`.  Below is an example ConfigMap yaml file that copies a MySQL .jar file from a web server using wget.
 
 ```
 kind: ConfigMap
@@ -163,7 +160,7 @@ spec:
 
   * HCL Launch requires non-root access to persistent storage. When using IBM File Storage you need to either use the IBM provided “gid” File storage class with default group ID 65531 or create your own customized storage class to specify a different group ID. Please follow the instructions at https://cloud.ibm.com/docs/containers?topic=containers-cs_troubleshoot_storage#cs_storage_nonroot for more details.
 
-7.  If a route or ingress is used to access the WSS or JMS port of the HCL Launch server from an HCL Launch agent, then port 443 should be specified along with the configured URL to access the proper service port defined for the HCL Launch server.
+7.  If a route or ingress is used to access the WSS port of the HCL Launch server from an HCL Launch agent, then port 443 should be specified along with the configured URL to access the proper service port defined for the HCL Launch server.
 
 ### PodSecurityPolicy Requirements
 
@@ -260,7 +257,6 @@ The Helm chart has the following values.
 | ingress | host | Host name used to access the Launch server UI. Leave blank on OpenShift to create default route. |  |
 |               | dfehost | Host name used to access the Launch server distributed front end (DFE) UI. Leave blank on OpenShift to create default route. |  |
 |               | wsshost | Host name used to access the Launch server WSS port. Leave blank on OpenShift to create default route. |  |
-|               | jmshost | Host name used to access the Launch server JMS port. Leave blank on OpenShift to create default route. |  |
 | resources | constraints.enabled | Specifies whether the resource constraints specified in this helm chart are enabled.   | true (default) or false  |
 |           | limits.cpu  | Describes the maximum amount of CPU allowed | Default is 4000m. See Kubernetes - [meaning of CPU](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu)  |
 |           | limits.memory | Describes the maximum amount of memory allowed | Default is 8Gi. See Kubernetes - [meaning of Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-memory) |
