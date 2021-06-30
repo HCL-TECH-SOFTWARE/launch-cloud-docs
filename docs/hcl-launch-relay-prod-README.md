@@ -9,12 +9,9 @@
 
 ## Prerequisites
 
-1. Kubernetes 1.16.0+; kubectl and oc CLI; Helm 3;
-  * Install and setup oc/kubectl CLI depending on your architecture.
-    * [ppc64le](https://mirror.openshift.com/pub/openshift-v4/ppc64le/clients/ocp/stable/openshift-client-linux.tar.gz)
-    * [s390x](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/stable/openshift-client-linux.tar.gz)
-    * [x86_64](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz)
-  * [Install and setup the Helm 3 CLI](https://helm.sh/docs/intro/install/).
+1. Kubernetes 1.16.0+; kubectl CLI; Helm 3;
+  * [Install and setup kubectl CLI](https://kubernetes.io/docs/tasks/tools/)
+  * [Install and setup the Helm 3 CLI](https://helm.sh/docs/intro/install/)
 
 2. Image and Helm Chart - The HCL Launch agent image and helm chart can be accessed via the HCL Container Registry (hclcr.io) and public Helm repository.
   * The public Helm chart repository can be accessed at https://hclcr.io/chartrepo/launch-helm and directions for accessing the HCL Launch server chart will be discussed later in this README.
@@ -22,14 +19,14 @@
     * An imagePullSecret must be created to be able to authenticate and pull images from the HCL Container Registry.  Once this secret has been created you will specify the secret name as the value for the image.secret parameter in the values.yaml you provide to 'helm install ...'  Note: Secrets are namespace scoped, so they must be created in every namespace you plan to install Launch into.  Following is an example command to create an imagePullSecret named 'entitledregistry-secret'.
 
 ```
-oc create secret docker-registry entitledregistry-secret --docker-username=<username> --docker-password=<cli-secret> --docker-server=hclcr.io
+kubectl create secret docker-registry entitledregistry-secret --docker-username=<username> --docker-password=<cli-secret> --docker-server=hclcr.io
 ```
 
 3. The HCL Launch agent relay must have a HCL Launch server to connect to.
 
 4. Secret - A Kubernetes Secret object must be created to store the HCL Launch server's Codestation authentication token and the password for all keystores used by the product.  The name of the secret you create must be specified in the property 'secret.name' in your values.yaml.
 
-* Through the oc/kubectl CLI, create a Secret object in the target namespace.  Generate the base64 encoded values for the Codestation token and password for all keystores used by the product.
+* Through the kubectl CLI, create a Secret object in the target namespace.  Generate the base64 encoded values for the Codestation token and password for all keystores used by the product.
 
 ```
 echo -n 255b21b7-ca48-4f2e-95c0-048fdbff4197 | base64
@@ -54,7 +51,7 @@ data:
   * Create the Secret using oc apply
 
 ```
-oc apply -f ./secret.yaml
+kubectl apply -f ./secret.yaml
 ```
 
   * Delete or shred the secret.yaml file.
@@ -193,7 +190,7 @@ The Helm chart has the following values.
 To increase or decrease the number of HCL Launch agent relay instances/replicas issue the following command:
 
 ```bash
-$ oc scale --replicas=2 statefulset/releaseName-hcl-launch-relay-prod
+$ kubectl scale --replicas=2 statefulset/releaseName-hcl-launch-relay-prod
 ```
 
 ## Storage
