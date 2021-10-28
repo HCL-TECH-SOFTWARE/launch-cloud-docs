@@ -227,6 +227,8 @@ The Helm chart has the following values.
 | Qualifier | Parameter  | Definition | Allowed Value |
 |---|---|---|---|
 | version |  | HCL Launch product version |  |
+| replicas | server | Number of HCL Launch server replicas | Non-zero number of replicas.  Defaults to 1 |
+|          | dfe | Number of DFE replicas | Number of Distributed Front End replicas.  Defaults to 0 |
 | image | pullPolicy | Image Pull Policy | Always, Never, or IfNotPresent. Defaults to Always |
 |       | secret |  An image pull secret used to authenticate with the image registry | Empty (default) if no authentication is required to access the image registry. |
 | service | type | Specify type of service | Valid options are ClusterIP, NodePort and LoadBalancer (for clusters that support LoadBalancer). Default is ClusterIP |
