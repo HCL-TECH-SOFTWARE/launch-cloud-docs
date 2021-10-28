@@ -159,6 +159,7 @@ The Helm chart has the following values.
 | Qualifier | Parameter  | Definition | Allowed Value |
 |---|---|---|---|
 | version |  | HCL Launch agent relay product vesion |  |
+| replicas | agent | Number of HCL Launch agent relay replicas | Non-zero number of replicas.  Defaults to 1 |
 | image | pullPolicy | Image Pull Policy | Always, Never, or IfNotPresent. Defaults to Always |
 |       | secret |  An image pull secret used to authenticate with the image registry | Empty (default) if no authentication is required to access the image registry. |
 | license | accept | Set to true to indicate you have read and agree to license agreements | false |
