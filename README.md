@@ -1,4 +1,4 @@
-# hcl-devops-deploy-cloud-docs
+# HCL DevOps Deploy Cloud Documentation
 
 ## Overview
 This project contains documentation for the HCL DevOps Deploy solution running in a Kubernetes-based environment.
