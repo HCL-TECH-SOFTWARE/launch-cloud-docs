@@ -7,6 +7,7 @@
 ## Chart Details
 * This chart deploys a single instance of the DevOps Deploy agent that may be scaled to multiple instances.
 * Includes a StatefulSet workload object
+* **NOTE:**  Helm Chart versions are independent from DevOps Deploy Product Versions.  One of the values that you will specify in the values.yaml file used during deployment of the product will be the version of DevOps Deploy Agent that that you wish to install.  The best practice is to use the latest available Helm chart and then select the product version that you wish to deploy.
 
 ## Prerequisites
 
@@ -15,7 +16,7 @@
   * [Install and setup the Helm 3 CLI](https://helm.sh/docs/intro/install/)
 
 2. Image and Helm Chart - The DevOps Deploy agent image and helm chart can be accessed via the HCL Container Registry (hclcr.io) and public Helm repository.
-  * The public Helm chart repository can be accessed at https://hclcr.io/chartrepo/launch-helm and directions for accessing the DevOps Deploy server chart will be discussed later in this README.
+  * The public Helm chart repository can be accessed at https://hclcr.io/harbor/projects/23/repositories/hcl-launch-agent-prod and directions for accessing the DevOps Deploy server chart will be discussed later in this README.
   * Get login credentials to the HCL Container Registry.
     * An imagePullSecret must be created to be able to authenticate and pull images from the HCL Container Registry.  Once this secret has been created you will specify the secret name as the value for the image.secret parameter in the values.yaml you provide to 'helm install ...'  Note: Secrets are namespace scoped, so they must be created in every namespace you plan to install DevOps Deploy agent into.  Following is an example command to create an imagePullSecret named 'entitledregistry-secret'.
 

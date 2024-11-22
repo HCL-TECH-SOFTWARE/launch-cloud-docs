@@ -6,6 +6,7 @@
 ## Chart Details
 * This chart deploys a single instance of the DevOps Deploy agent relay that may be scaled to multiple instances.
 * Includes a StatefulSet workload object
+* **NOTE:**  Helm Chart versions are independent from DevOps Deploy Product Versions.  One of the values that you will specify in the values.yaml file used during deployment of the product will be the version of DevOps Deploy Agent Relay that that you wish to install.  The best practice is to use the latest available Helm chart and then select the product version that you wish to deploy.
 
 ## Prerequisites
 
@@ -14,7 +15,7 @@
   * [Install and setup the Helm 3 CLI](https://helm.sh/docs/intro/install/)
 
 2. Image and Helm Chart - The DevOps Deploy agent relay image and helm chart can be accessed via the HCL Container Registry (hclcr.io) and public Helm repository.
-  * The public Helm chart repository can be accessed at https://hclcr.io/chartrepo/launch-helm and directions for accessing the DevOps Deploy server chart will be discussed later in this README.
+  * The public Helm chart repository can be accessed at https://hclcr.io/harbor/projects/23/repositories/hcl-launch-relay-prod and directions for accessing the DevOps Deploy server chart will be discussed later in this README.
   * Get login credentials to the HCL Container Registry.
     * An imagePullSecret must be created to be able to authenticate and pull images from the HCL Container Registry.  Once this secret has been created you will specify the secret name as the value for the image.secret parameter in the values.yaml you provide to 'helm install ...'  Note: Secrets are namespace scoped, so they must be created in every namespace you plan to install DevOps Deploy agent relay into.  Following is an example command to create an imagePullSecret named 'entitledregistry-secret'.
 
@@ -26,35 +27,15 @@ kubectl create secret docker-registry entitledregistry-secret --docker-username=
 
 4. Secret - A Kubernetes Secret object must be created to store the DevOps Deploy server's Codestation authentication token and the password for all keystores used by the product.  The name of the secret you create must be specified in the property 'secret.name' in your values.yaml.
 
-* Through the kubectl CLI, create a Secret object in the target namespace.  Generate the base64 encoded values for the Codestation token and password for all keystores used by the product.
+* Through the oc/kubectl CLI, create a Secret object in the target namespace.
 
-```
-echo -n 255b21b7-ca48-4f2e-95c0-048fdbff4197 | base64
-MjU1YjIxYjctY2E0OC00ZjJlLTk1YzAtMDQ4ZmRiZmY0MTk3
-echo -n 'MyKeystorePassword' | base64
-TXlLZXlzdG9yZVBhc3N3b3Jk
-```
-
-  * Create a file named secret.yaml with the following contents, using your secret name and base64 encoded values.
-
-```
-apiVersion: v1
-kind: Secret
-metadata:
-  name: devopsdeploy-relay-secrets
-type: Opaque
-data:
-  cspassword: MjU1YjIxYjctY2E0OC00ZjJlLTk1YzAtMDQ4ZmRiZmY0MTk3
-  keystorepassword: TXlLZXlzdG9yZVBhc3N3b3Jk
+```bash
+oc create secret generic ucd-secrets \
+  --from-literal=cspassword=255b21b7-ca48-4f2e-95c0-048fdbff4197 \
+  --from-literal=keystorepassword=MyKeystorePassword
 ```
 
-  * Create the Secret using oc apply
-
-```
-kubectl apply -f ./secret.yaml
-```
-
-  * Delete or shred the secret.yaml file.
+**NOTE:** If you need to change the keystorepassword after the initial agent relay deployment, follow the instructions shown here: [Changing Password For Keystore File](#changing-password-for-keystore-file).
 
 5. A PersistentVolume that will hold the conf directory for the DevOps Deploy agent relay is required.  If your cluster supports dynamic volume provisioning you will not need to create a PersistentVolume (PV) or PersistentVolumeClaim (PVC) before installing this chart.  If your cluster does not support dynamic volume provisioning, you will need to either ensure a PV is available or you will need to create one before installing this chart.  You can optionally create the PVC to bind it to a specific PV, or you can let the chart create a PVC and bind to any available PV that meets the required size and storage class.  Sample YAML to create the PV and PVC are provided below.
 
@@ -143,6 +124,19 @@ $ helm delete my-devopsdeploy-agentrelay-release
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
+## Changing Password For Keystore File
+
+To change the password used by the DevOps Deploy Agent Relay keystore file, follow these steps:
+
+1. Scale the statefulset resource to 0 to shutdown the DevOps Deploy Agent Relay.
+
+2. Update the Kubernetes secret used to define the agent relay passwords to set the **keystorepassword** to the new value.
+
+3. **IMPORTANT:** Update the Kubernetes secret used to define the agent relay passwords to set the **previouskeystorepassword** to the existing keystore password being used.
+
+4. Scale the statefulset resource to 1 to restart the DevOps Deploy Agent Relay.
+
+5. When the Agent Relay is restarted, the keystore passwords will be updated to the new value during pod initialization.
 
 ## Configuration
 
