@@ -212,7 +212,7 @@ The Helm chart has the following values.
 |               | dbVolume.storageClassName | If createDatasbase equals "true", specifies the name of the storageclass to use. | |
 |               | dbVolume.size | If createDatasbase equals "true", specifies the size of the persistent volume used by the database. | |
 | secureConnections | required | Specify whether DevOps Deploy server connections are required to be secure | Default value is "true" |
-                    | tlsSecret | Name of Kubernetes TLS secret that contains the signed certificate for the Deploy server | |
+|                   | tlsSecret | Name of Kubernetes TLS secret that contains the signed certificate for the Deploy server | |
 | secret        | name | Kubernetes secret which defines required DevOps Deploy passwords. | You may leave this blank to use default name of HelmReleaseName-secrets where HelmReleaseName is the name of your Helm Release, otherwise specify the secret name here. If name is left blank and HelReleaseName-secrets does not exist in the namepace, then a default secret will be automatically created with randomized values for the passwords. |
 | license       | accept    | Set to true to indicate you have read and agree to license agreements | false |
 |               | serverURL | Information required to connect to the DevOps Deploy license server. | Empty (default) to begin a 60-day evaluation license period.|
@@ -233,7 +233,7 @@ The Helm chart has the following values.
 | ingress       | host    | Host name used to access the DevOps Deploy server UI. Leave blank on OpenShift to create default route. |  |
 |               | dfehost | Host name used to access the DevOps Deploy server distributed front end (DFE) UI. Leave blank on OpenShift to create default route. |  |
 |               | wsshost | Host name used to access the DevOps Deploy server WSS port. Leave blank on OpenShift to create default route. |  |
-                | tlsSecret | Name of Kubernetes TLS secret containing certificate for Edge TLS termination by the ingress/route. | |
+|               | tlsSecret | Name of Kubernetes TLS secret containing certificate for Edge TLS termination by the ingress/route. | |
 | resources     | constraints.enabled | Specifies whether the resource constraints specified in this helm chart are enabled. | true (default) or false  |
 |               | limits.cpu          | Describes the maximum amount of CPU allowed | Default is 4000m. See Kubernetes - [meaning of CPU](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu)  |
 |               | limits.memory       | Describes the maximum amount of memory allowed | Default is 8Gi. See Kubernetes - [meaning of Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-memory) |
