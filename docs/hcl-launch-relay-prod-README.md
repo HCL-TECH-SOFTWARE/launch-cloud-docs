@@ -114,6 +114,10 @@ $ helm install my-devopsdeploy-agentrelay-release oci://hclcr.io/launch-helm/hcl
 ## Verifying the Chart
 Check the Resources->Agent Relays page of the DevOps Deploy server UI to verify the agent relay has connected successfully.
 
+## Upgrading the Chart
+
+Check [here](https://support.hcl-software.com/community?id=community_blog&sys_id=281a1bdafb07a6140cc3f0ff5eefdc35) for information about ugrading the chart.
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-devopsdeploy-agentrelay-release` deployment:
@@ -153,7 +157,15 @@ The Helm chart has the following values.
 | image | pullPolicy | Image Pull Policy | Always, Never, or IfNotPresent. Defaults to Always |
 |       | secret |  An image pull secret used to authenticate with the image registry | Empty (default) if no authentication is required to access the image registry. |
 | license | accept | Set to true to indicate you have read and agree to license agreements | false |
+| statefulset | annotations | Annotations for statefulset | Default value is "" |
+|             | topologySpreadConstraints.enabled | Determines if topologySpreadConstraints are defined for the agent statefulset | Default value is false |
+|             | topologySpreadConstraints.maxSkew | Describes the degree to which Pods may be unevenly distributed | Default value is 1 |
+|             | topologySpreadConstraints.topologyKey | The key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. | Default value is "kubernetes.io/arch" |
+|             | topologySpreadConstraints.whenUnsatisfiable | Indicates how to deal with a Pod if it doesn't satisfy the spread constraint. | Default value is ScheduleAnyway |
 | service | type | Specify type of service | Valid options are ClusterIP, NodePort and LoadBalancer (for clusters that support LoadBalancer). Default is ClusterIP |
+|         | annotations | Annotations for the service | Default value is "" |
+|         | loadBalancerClass | https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class | Default value is "" |
+|         | loadBalancerSourceRanges | https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service | Default value is none |
 | persistence | enabled | Determines if persistent storage will be used to hold the DevOps Deploy agent relay conf directory contents. This should always be true to preserve agent relay data on container restarts. | Default value "true" |
 |             | useDynamicProvisioning | Set to "true" if the cluster supports dynamic storage provisoning | Default value "false" |
 |             | fsGroup | The group ID to use to access persistent volumes | Default value "1001" |
@@ -169,13 +181,13 @@ The Helm chart has the following values.
 |                        | serverUrl | The full URL of the central server to connect to, such as https://myserver.example.com:8443. |  |
 |                        | maxCacheSize | The size to which to limit the artifact cache, such as 500M for 500 MB or 5G for 5 GB. To not put a limit on the cache, specify none. |  |
 |                        | geotags | If you choose to cache files on the relay, you can specify one or more component version statuses here, separated by semicolons. The agent relay automatically caches component versions with any of these statuses so that those versions are ready when they are needed for a deployment. A status can contain a space except in the first or last position. A status can contain commas. The special * status replicates all artifacts, but use this status with caution, because it can make the agent relay store a large amount of data. If no value is specified, no component versions are cached automatically. |  |
-| ingress | httpproxyhost | Host name used to access the DevOps Deploy agent relay http proxy port. Leave blank on OpenShift to create default route. |  |
-|               | codestationhost | Host name used to access the DevOps Deploy agent relay codestation port. Leave blank on OpenShift to create default route. |  |
 | resources | constraints.enabled | Specifies whether the resource constraints specified in this helm chart are enabled.   | false (default) or true  |
 |           | limits.cpu  | Describes the maximum amount of CPU allowed | Default is 4000m. See Kubernetes - [meaning of CPU](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu)  |
 |           | limits.memory | Describes the maximum amount of memory allowed | Default is 4Gi. See Kubernetes - [meaning of Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-memory) |
 |           | requests.cpu  | Describes the minimum amount of CPU required - if not specified will default to limit (if specified) or otherwise implementation-defined value. | Default is 100m. See Kubernetes - [meaning of CPU](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu) |
 |           | requests.memory | Describes the minimum amount of memory required If not specified, the memory amount will default to the limit (if specified) or the implementation-defined value | Default is 200Mi. See Kubernetes - [meaning of Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-memory) |
+| javaContainerOptions | activeProcessorCount | JVM argument used to explicitly specify the number of CPU cores that the Java Virtual Machine (JVM) should consider as available. | Default is 2 |
+|                      | maxRAMPercentage | Allows the Java Virtual Machine (JVM) to automatically determine the maximum heap size as a percentage of the container's allocated memory limit, rather than the total physical RAM of the host system. | Default is 70 |
 
 ## Scaling
 To increase or decrease the number of DevOps Deploy agent relay instances/replicas issue the following command:
