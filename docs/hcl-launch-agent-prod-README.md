@@ -18,7 +18,12 @@
 2. Image and Helm Chart - The DevOps Deploy agent image and helm chart can be accessed via the HCL Container Registry (hclcr.io) and public Helm repository.
   * The public Helm chart repository can be accessed at https://hclcr.io/harbor/projects/23/repositories/hcl-launch-agent-prod and directions for accessing the DevOps Deploy server chart will be discussed later in this README.
   * Get login credentials to the HCL Container Registry.
-    * An imagePullSecret must be created to be able to authenticate and pull images from the HCL Container Registry.  Once this secret has been created you will specify the secret name as the value for the image.secret parameter in the values.yaml you provide to 'helm install ...'  Note: Secrets are namespace scoped, so they must be created in every namespace you plan to install DevOps Deploy agent into.  Following is an example command to create an imagePullSecret named 'entitledregistry-secret'.
+    * To improve the customer download and install experience of Cloud-native container-based software such as HCL DevOps Deploy, HCL Software utilizes a container registry from Harbor.  Access control to Harbor is managed by secure Customer Identity and Access Management (CIAM) software from Okta.
+To request access to the container registry, submit a request for Harbor access through https://support.hcl-software.com/csm?id=guest_csm_creation
+Be sure to select the category "Customer Support Portal" and mention in the description that you require Harbor portal access.
+    * Once the request is submitted, entitlement will be verified. If its valid, the user will be provided access to the container registry.
+After the Okta account registration is complete, you will receive an email from noreply@okta.com that includes steps to  activate your account. Once you activate your account and create your password, you can log into HCL Software’s Harbor container registry at https://hclcr.io.  You can then generate and retrieve your CLI secret from your User Profile.
+  * An imagePullSecret must be created to be able to authenticate and pull images from the HCL Container Registry.  Once this secret has been created you will specify the secret name as the value for the image.secret parameter in the values.yaml you provide to 'helm install ...'  Note: Secrets are namespace scoped, so they must be created in every namespace you plan to install DevOps Deploy agent into.  Following is an example command to create an imagePullSecret named 'entitledregistry-secret'.
 
 ```
 kubectl create secret docker-registry entitledregistry-secret --docker-username=<username> --docker-password=<cli-secret> --docker-server=hclcr.io
