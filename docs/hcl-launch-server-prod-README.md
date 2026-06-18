@@ -201,6 +201,7 @@ The Helm chart has the following values.
 
 | Qualifier | Parameter  | Definition | Allowed Value |
 |---|---|---|---|
+| global        | ambassadorId | Emissary instance ID. Do not set ambassadorId if running only one instance. | Default is "" |
 | version       | | DevOps Deploy product version |  |
 | replicas      | server | Number of DevOps Deploy server replicas | Non-zero number of replicas. Defaults to 1 |
 |               | dfe    | Number of DFE replicas | Number of Distributed Front End replicas. Defaults to 0 |
@@ -210,6 +211,13 @@ The Helm chart has the following values.
 |               | annotations | Annotations for the service | Default value is "" |
 |               | loadBalancerClass | https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class | Default value is "" |
 |               | loadBalancerSourceRanges | https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service | Default value is none |
+| emissary      | host.enabled | Enable creation of Emissary resources | Default is true |
+|               | host.authority | Used to automatically request and renew TLS certificates from an ACME authority like Let's Encrypt, using the HTTP-01 challenge. | Default is none |
+|               | listener.httpsPort | HTTPS port listener value | Default is 8443 |
+|               | listener.httpPort | HTTP port listener value | Default is 8080 |
+|               | listener.wssPort | WSS port listener value | Default is 7919 |
+|               | listener.securityModel | Defines how Emissary determines if a request is secure (e.g., whether to trust X-Forwarded-Proto headers) | Default is XFP |
+|               | listener.l7Depth | Defines how many trusted Layer 7 proxies (like a cloud load balancer) exist between the client and Emissary, allowing Emissary to accurately determine the true client IP and accept X-Forwarded-Proto headers | Default is 0 |
 | database      | type | The type of database DevOps Deploy will connect to | Valid values are db2, mysql, oracle, and sqlserver.  Default is mysql. This value is ignored if database.createDatabase=true. |
 |               | name | The name of the database to use | Default is "deploydb" |
 |               | hostname | The hostname/IP of the database server. This value is ignored if database.createDatabase=true. | |
